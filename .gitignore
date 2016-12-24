@@ -9,6 +9,9 @@ runtime\-EclipseApplication/
 **/xtend-gen/
 **/*_gen
 *.jar
+*.classpath
+*.project
+*~
 **/*.out
 ## Core latex/pdflatex auxiliary files:
 *.aux

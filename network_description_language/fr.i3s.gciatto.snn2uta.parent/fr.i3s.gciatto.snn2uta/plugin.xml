@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package 
+			uri = "http://www.i3s.fr/gciatto/snn2uta/NetworkDescriptionLanguage"
+			class = "fr.i3s.gciatto.snn2uta.networkDescriptionLanguage.NetworkDescriptionLanguagePackage"
+			genModel = "model/generated/NetworkDescriptionLanguage.genmodel" />
+	</extension>
+</plugin>

@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: fr.i3s.gciatto.snn2uta
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: fr.i3s.gciatto.snn2uta; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib,
+ org.antlr.runtime,
+ org.eclipse.xtext.util,
+ org.eclipse.xtend.lib,
+ org.eclipse.emf.common
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: fr.i3s.gciatto.snn2uta.networkDescriptionLanguage,
+ fr.i3s.gciatto.snn2uta.networkDescriptionLanguage.impl,
+ fr.i3s.gciatto.snn2uta.serializer,
+ fr.i3s.gciatto.snn2uta.generator,
+ fr.i3s.gciatto.snn2uta,
+ fr.i3s.gciatto.snn2uta.services,
+ fr.i3s.gciatto.snn2uta.scoping,
+ fr.i3s.gciatto.snn2uta.parser.antlr.internal,
+ fr.i3s.gciatto.snn2uta.parser.antlr,
+ fr.i3s.gciatto.snn2uta.networkDescriptionLanguage.util,
+ fr.i3s.gciatto.snn2uta.validation
+Import-Package: org.apache.log4j

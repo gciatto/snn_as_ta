@@ -1,0 +1,160 @@
+grammar fr.i3s.gciatto.snn2uta.NetworkDescriptionLanguage with org.eclipse.xtext.common.Terminals
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+generate networkDescriptionLanguage "http://www.i3s.fr/gciatto/snn2uta/NetworkDescriptionLanguage"
+
+Network
+	:	'network' name=ID '{' (
+			globals+=GlobalParam
+		|	neurons+=Neuron
+		|	synapses+=Synapsis
+		)* '}'
+	;
+	
+GlobalParam returns NumericParam
+	:	DiscretizationGranularityParam
+	|	TimeUnit
+	|	TimeOffset
+	;
+	
+DiscretizationGranularityParam returns IntParam
+	:	{ DiscretizationGranularityParam } name='granularity' ':' value=INTEGER
+	;
+	
+TimeUnit returns IntParam
+	:	{ TimeUnit } name='time_unit' ':' value=INTEGER
+	;
+	
+TimeOffset returns IntParam
+	:	{ TimeOffset } name='time_offset' ':' value=INTEGER
+	;
+	
+fragment NeuronBody returns Neuron
+	:	name=ID '{' (
+			(args+=RefractoryPeriodParam)?  
+		&	(args+=ThresholdParam)?
+		&	(args+=LeakageFactorParam)?
+		&	(args+=AccumulationPeriodParam)?
+		) '}'
+	;
+	
+Neuron
+	:	InputNeuron | InnerNeuron | OutputNeuron
+	;
+	
+//NonOutputNeuron
+//	:	InputNeuron | InnerNeuron
+//	;
+//	
+//NonInputNeuron
+//	:	InnerNeuron | OutputNeuron
+//	;
+	
+InputNeuron returns Neuron
+	:	{ InputNeuron } 'input' name=ID '{' InputSequence '}'
+	;
+	
+fragment InputSequence returns Neuron
+	:	empty?='empty'
+	|	any?='any' ('(' minDelay=INTEGER (',' initialDelay=INTEGER)? ')')?
+	|	rate?='rate' ('(' period=INTEGER (',' initialDelay=INTEGER)? ')')?
+	|	Prologue finite+=Spike
+	|	Prologue '(' PeriodicPart ')'
+	|	PeriodicPart
+	;
+	
+fragment Prologue returns Neuron
+	:	(finite+=Pause)? (finite+=Spike finite+=Pause)*
+	;
+	
+fragment PeriodicPart returns Neuron
+	:	(periodic+=Spike periodic+=Pause)+ 'repeat'
+	;
+	
+InnerNeuron returns Neuron
+	:	'neuron' NeuronBody
+	;
+	
+OutputNeuron returns Neuron
+	:	{ OutputNeuron } output?='output' 'neuron' NeuronBody
+	;
+
+RefractoryPeriodParam returns IntParam
+	:	{ RefractoryPeriodParam } name='refractory' ':' value=INTEGER
+	;
+	
+AccumulationPeriodParam returns IntParam
+	:	{ AccumulationPeriodParam } name='accumulation' ':' value=INTEGER
+	;
+
+ThresholdParam returns FloatParam
+	:	{ ThresholdParam } name='threshold' ':' value=FLOAT
+	;
+	
+LeakageFactorParam returns RatioParam
+	:	{ LeakageFactorParam }  name='leakage' ':' value=Ratio
+	;
+	
+Synapsis
+	:	source=[Neuron|ID] '->' destination=[Neuron|ID] (':' weight=FLOAT)?
+	;
+	
+Event
+	:	Spike
+	|	Pause
+	;
+
+Spike
+	:	name='spike'
+	;
+
+Pause
+	:	name='pause' ('(' duration=INTEGER ')')?
+	;
+	
+NumericParam
+	:	IntParam
+	|	FloatParam
+	|	RatioParam 
+	;
+	
+IntParam
+	:	RefractoryPeriodParam
+	|	AccumulationPeriodParam
+	|	DiscretizationGranularityParam
+	|	name=ID ':' value=INTEGER
+	;
+	
+FloatParam
+	:	ThresholdParam
+	|	name=ID ':' value=FLOAT
+	;
+	
+RatioParam
+	:	name=ID ':' value=Ratio
+	|	LeakageFactorParam
+	;
+	
+Ratio
+	:	num=INTEGER '\\' den=INTEGER
+	;
+
+terminal fragment NAT
+	:   ('1'..'9') ('0'..'9')* | '0'
+	;
+	
+terminal fragment DSEQ
+	:	('0' .. '9')+
+	;
+	
+//terminal XID
+//	:	'x-' ID
+//	;
+	
+terminal FLOAT returns ecore::EDoubleObject
+	:   INTEGER '.' DSEQ (('E' | 'e') DSEQ)?
+	;
+	
+terminal INTEGER returns ecore::EIntegerObject
+	:   ('+' | '-')? NAT
+	;
