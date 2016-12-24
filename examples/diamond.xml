@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>typedef struct {
+    int num;
+    int den;
+} ratio_t;
+
+const int R = 100;
+typedef int[-R, R] weight_t;
+
+weight_t w1[1] = { R };
+weight_t w2[1] = { R };
+weight_t w3[1] = { R };
+weight_t w4[2] = { R, R };
+
+broadcast chan y0;
+broadcast chan y1;
+broadcast chan y2;
+broadcast chan y3;
+broadcast chan y4;</declaration>
+	<template>
+		<name>Neuron1</name>
+		<parameter>broadcast chan &amp;x, weight_t &amp;w[1], broadcast chan &amp;y</parameter>
+		<declaration>clock t;
+const int N = 1;
+const int T = 1;
+const int tau = 1;
+const int theta = R - 1;
+ratio_t lambda = { 1, 2 };
+
+int a = 0;
+int p = 0;
+
+bool fired[N] = { false };
+
+void updatePotential() { 
+    p = (a * lambda.den + p * lambda.num) / lambda.den;
+}
+
+void onInput(int i) {
+    a += w[i];
+    fired[i] = true;
+}
+
+void onAccumulationEnd() {
+    updatePotential();
+}
+
+void onAccumulationBegin(bool hasEmitted) {
+    t = 0;
+    a = 0;
+    for (i : int[0, N - 1]) {
+        fired[i] = false;
+    }
+}
+
+void onRefractoryEnd() {
+    
+}
+
+void onRefractoryBegin() {
+    p = 0;
+    t = 0;
+}</declaration>
+		<location id="id0" x="-187" y="-807">
+			<name x="-212" y="-807">A</name>
+			<label kind="invariant" x="-179" y="-850">t &lt;= T</label>
+		</location>
+		<location id="id1" x="136" y="-1070">
+			<name x="102" y="-1096">W</name>
+			<label kind="invariant" x="59" y="-1062">t &lt;= tau</label>
+		</location>
+		<location id="id2" x="136" y="-807">
+			<name x="145" y="-790">D</name>
+			<committed/>
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-161" y="-1062">t == tau</label>
+			<label kind="assignment" x="-161" y="-1045">onRefractoryEnd(),
+	onAccumulationBegin(true)</label>
+			<nail x="-187" y="-1070"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="guard" x="51" y="-960">p &gt;= theta</label>
+			<label kind="synchronisation" x="110" y="-943">y!</label>
+			<label kind="assignment" x="-8" y="-926">onRefractoryBegin()</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-51" y="-866">p &lt; theta</label>
+			<label kind="assignment" x="-93" y="-883">onAccumulationBegin(false)</label>
+			<nail x="-25" y="-849"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-25" y="-807">t == T</label>
+			<label kind="assignment" x="-59" y="-790">onAccumulationEnd()</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-187" y="-765">t &lt;= T</label>
+			<label kind="synchronisation" x="-187" y="-747">x?</label>
+			<label kind="assignment" x="-187" y="-731">onInput(0)</label>
+			<nail x="-153" y="-773"/>
+			<nail x="-187" y="-773"/>
+		</transition>
+	</template>
+	
+	<template>
+		<name>Neuron2</name>
+		<parameter>broadcast chan &amp;x0, broadcast chan &amp;x1, weight_t &amp;w[2], broadcast chan &amp;y</parameter>
+		<declaration>clock t;
+const int N = 2;
+const int T = 1;
+const int tau = 1;
+const int theta = R - 1;
+ratio_t lambda = { 1, 2 };
+
+int a = 0;
+int p = 0;
+
+bool fired[N] = { false, false };
+
+void updatePotential() { 
+    p = (a * lambda.den + p * lambda.num) / lambda.den;
+}
+
+void onInput(int i) {
+    a += w[i];
+    fired[i] = true;
+}
+
+void onAccumulationEnd() {
+    updatePotential();
+}
+
+void onAccumulationBegin(bool hasEmitted) {
+    t = 0;
+    a = 0;
+    for (i : int[0, N - 1]) {
+        fired[i] = false;
+    }
+}
+
+void onRefractoryEnd() {
+    
+}
+
+void onRefractoryBegin() {
+    p = 0;
+    t = 0;
+}</declaration>
+		<location id="id6" x="68" y="-1266">
+			<name x="34" y="-1292">W</name>
+			<label kind="invariant" x="-9" y="-1258">t &lt;= tau</label>
+		</location>
+		<location id="id7" x="68" y="-1003">
+			<name x="77" y="-986">D</name>
+			<committed/>
+		</location>
+		<location id="id8" x="-255" y="-1003">
+			<name x="-289" y="-1003">A</name>
+			<label kind="invariant" x="-247" y="-1046">t &lt;= T</label>
+		</location>
+		<init ref="id8"/>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-229" y="-884">t &lt;= T</label>
+			<label kind="synchronisation" x="-229" y="-867">x1?</label>
+			<label kind="assignment" x="-229" y="-850">onInput(1)</label>
+			<nail x="-102" y="-892"/>
+			<nail x="-289" y="-892"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-229" y="-1258">t == tau</label>
+			<label kind="assignment" x="-229" y="-1241">onRefractoryEnd(),
+	onAccumulationBegin(true)</label>
+			<nail x="-255" y="-1266"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-17" y="-1156">p &gt;= theta</label>
+			<label kind="synchronisation" x="42" y="-1139">y!</label>
+			<label kind="assignment" x="-76" y="-1122">onRefractoryBegin()</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-119" y="-1062">p &lt; theta</label>
+			<label kind="assignment" x="-161" y="-1079">onAccumulationBegin(false)</label>
+			<nail x="-93" y="-1045"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-93" y="-1003">t == T</label>
+			<label kind="assignment" x="-127" y="-986">onAccumulationEnd()</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-255" y="-961">t &lt;= T</label>
+			<label kind="synchronisation" x="-255" y="-943">x0?</label>
+			<label kind="assignment" x="-255" y="-927">onInput(0)</label>
+			<nail x="-221" y="-969"/>
+			<nail x="-255" y="-969"/>
+		</transition>
+	</template>
+	<template>
+		<name>NonDeterministicInput</name>
+		<parameter>broadcast chan &amp;x</parameter>
+		<declaration>clock t = 0.0;
+const int D = 1;
+const int Tmin = 1;
+	
+			</declaration>
+		<location id="id3" x="527" y="-178">
+			<name x="517" y="-212">B</name>
+			<label kind="invariant" x="544" y="-187">t &lt;= D</label>
+			<label kind="exponentialrate" x="518" y="-161">1</label>
+		</location>
+		<location id="id4" x="314" y="-178">
+			<name x="304" y="-212">S</name>
+			<committed/>
+		</location>
+		<location id="id5" x="42" y="-178">
+			<name x="32" y="-212">W</name>
+			<label kind="exponentialrate" x="25" y="-170">1</label>
+		</location>
+		<init ref="id3"/>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="416" y="-195">t == D</label>
+			<label kind="synchronisation" x="391" y="-195">x!</label>
+			<label kind="assignment" x="399" y="-178">t = 0</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<nail x="186" y="-136"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="guard" x="152" y="-280">t &gt;= Tmin</label>
+			<label kind="synchronisation" x="152" y="-263">x!</label>
+			<label kind="assignment" x="152" y="-246">t = 0</label>
+			<nail x="169" y="-221"/>
+		</transition>
+	</template>>
+	<template>
+		<name>FixedRateInput</name>
+		<parameter>broadcast chan &amp;x</parameter>
+		<declaration>clock t = 0.0;
+				
+const int D = 0;
+	
+const int T = 1;
+	
+	</declaration>
+		<location id="id9" x="221" y="-127">
+			<name x="211" y="-161">S</name>
+			<label kind="invariant" x="211" y="-110">t &lt;= T</label>
+			<label kind="exponentialrate" x="211" y="-93">1</label>
+		</location>
+		<location id="id10" x="-144" y="-127">
+			<name x="-154" y="-161">W</name>
+			<label kind="invariant" x="-154" y="-110">t &lt; T</label>
+			<label kind="exponentialrate" x="-154" y="-93">1</label>
+		</location>
+		<location id="id11" x="-467" y="-127">
+			<name x="-477" y="-161">B</name>
+			<label kind="invariant" x="-477" y="-110">t &lt;= D</label>
+			<label kind="exponentialrate" x="-477" y="-93">1</label>
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="25" y="-59">t == T</label>
+			<label kind="assignment" x="25" y="-85">t = 0</label>
+			<nail x="42" y="-59"/>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-8" y="-212">t &gt; 0 &amp;&amp; t &lt; T</label>
+			<label kind="synchronisation" x="34" y="-187">x!</label>
+			<nail x="34" y="-195"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-374" y="-144">t == D</label>
+			<label kind="assignment" x="-365" y="-127">t = 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Output</name>
+		<parameter>broadcast chan &amp;y</parameter>
+		<declaration>clock ls;</declaration>
+		<location id="id12" x="-213" y="-255">
+			<name x="-223" y="-289">O</name>
+			<committed/>
+		</location>
+		<location id="id13" x="-476" y="-255">
+			<name x="-486" y="-289">W</name>
+		</location>
+		<init ref="id13"/>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id13"/>
+			<nail x="-349" y="-204"/>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-357" y="-331">y?</label>
+			<label kind="assignment" x="-365" y="-297">ls = 0</label>
+			<nail x="-348" y="-314"/>
+		</transition>
+	</template>
+	<system>// Input producers
+I = FixedRateInput(y0);
+// I = NonDeterministicInput(y0);
+
+// Neurons
+N1 = Neuron1(y0, w1, y1);
+N2 = Neuron1(y1, w2, y2);
+N3 = Neuron1(y1, w3, y3);
+N4 = Neuron2(y2, y3, w4, y4);
+
+// Output consumers
+// O1 = Output(y1);
+// O2 = Output(y2);
+// O3 = Output(y3);
+O4 = Output(y4);
+
+system I, N1, N2, N3, N4, O4;</system>
+	<queries>
+		<query>
+			<formula>A&lt;&gt; (O4.ls &gt; 100)
+			</formula>
+			<comment>N4 può emettere?
+			</comment>
+		</query>
+	</queries>
+</nta>
