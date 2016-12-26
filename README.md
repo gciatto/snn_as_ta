@@ -28,3 +28,39 @@ where:
     * `y_0` carryies the output of the input generator;
 * `w_i[j]` is the *weight* of the `j`-th input synapse of the `i`-th neuron,
     * if the neuron only has 1 input synapse, the `[j]` index is omitted.
+
+The file contains a *Declarations* section (contining global definitions), a number of *templates* (each defining one *Timed Automaton* structure and behavior) and a *System declarations* section (where template template are instantiated and interconnected).
+
+#### Global *Declarations*
+Shared symbols and types are defined in this section.
+
+```c
+// Fraction type definition
+// as a <num, den> pair
+typedef struct {
+    int num;
+    int den;
+} ratio_t;
+
+// Discretization Granularity constant definition
+// The [0, 1] real interval is divided into R parts:
+// this is how real number are represented
+const int R = 100;
+
+// Synaptic weight type definition
+// as an integer in the -R ... R interval
+typedef int[-R, R] weight_t;
+
+// Synaptic weights definitions
+weight_t w1[1] = { R }; // w_1 = 1
+weight_t w2[1] = { R / 2 }; // w_2 = 0.5
+weight_t w3[1] = { R / 2 }; // w_3 = 0.5
+weight_t w4[2] = { R / 4, R / 3}; // w_4[0] = 0.25 and w_4[1] = 0.33
+
+// Output channels definitions
+broadcast chan y0;
+broadcast chan y1;
+broadcast chan y2;
+broadcast chan y3;
+broadcast chan y4;
+```
