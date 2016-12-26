@@ -20,4 +20,5 @@ Example and generation tool
 * File `ndl2uppaal.jar` is a Java console application implementing the *Network Generator*. The only requirimenet is `Java 8`.
 
 ### Diamond examples
-The `examples/diamond.xml` file is an `Uppaal` system representing a Spiking Neural Network
+The `examples/diamond.xml` file is an `Uppaal` system representing a Spiking Neural Network. The network topology is the diamond shown in the following figure:
+![The diamond network topology](./.site/img/structure.png)
