@@ -1,4 +1,4 @@
-Spiking Neural Networks ad Timed Automata
+Spiking Neural Networks as Timed Automata
 =========================================
 ##### Giovanni CIATTO, Elisabetta DE MARIA, Cinzia DI GIUSTO
 
@@ -18,3 +18,6 @@ Example and generation tool
 * Directory `network_description_language` contains several `Xtext` projects implementing the *Network Generator* and the respective `Eclipse` plugin. We kindly suggest to manipulate such code by means of the `Eclipse` IDE.
 
 * File `ndl2uppaal.jar` is a Java console application implementing the *Network Generator*. The only requirimenet is `Java 8`.
+
+### Diamond examples
+The `examples/diamond.xml` file is an `Uppaal` system representing a Spiking Neural Network
