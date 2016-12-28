@@ -225,13 +225,82 @@ system I, N1, N2, N3, N4, O4;
 ```
 
 ### Network Description Language & Generator
-The network description 
+The Network Description Language (NDL) provides a formal way to specify the parameters and the topology of a Spiking Neural Network composed by Leaky Integrate and Fire neurons.
+It also allows to specify the input sequences used to feed the network.
+We finally provide a generator able to encode a network description expressed in NDL into a Timed Automata system for the `Uppaal` simulator and verifier.
 
+
+#### The language
+A network description consist of a text file having the `.ndl` extension.
+
+The network description file has the following structure:
+```
+network <Network name> {
+    <Neuron declarations section>
+    <Network topology section>
+}
+```
+
+The *Neuron declarations section* contains the definitions of several input sequences, intermediate neurons or output neurons.
+
+For what concerns input sequences:
+* a *Fixed-Rate input sequence* can be defined as follows:
+    ```
+    input <Sequence Name> {
+        rate(<time window>, <initial delay>)
+    }
+    ```
+
+* a *Non-Deterministic input sequence* can be defined as follows:
+    ```
+    input <Sequence Name> {
+        any(<minimum time distance>, <initial delay>)
+    }
+    ```
+* a *specific input sequence* can be defined be means of a regular language:
+    ```
+    input <Sequence Name> {
+        <Sequence>
+    }
+    ```
+    where `<Sequence>` can rewritten as (`spike`, `pause`, `)` and `(` are terminals):
+    ```
+    <Sequence> ::= <Prologue> `spike`
+                |  <Prologue> `(` <Periodic> `)`
+                |  <Periodic>
+
+    <Prologue> ::= <Pause>? ( `spike` <Pause> )*
+
+    <Periodic> ::= ( `spike` <Pause> )+ `repeat`
+
+    <Pause>    ::= `pause` ( `(` <Pause Duration> `)` )?
+    ```
+
+An *intermediate* neuron definition has the following structure:
+```
+neuron <Neuron name> {
+    accumulation: <positive integer>
+    leakage: <numerator> \ <denominator>
+    refractory: <positive integer>
+    threshold: <real number in [-1, 1]>
+}
+```
+where all fields are optional and have a default value.
+
+An *output* neuron definition simply differs for the `output` keyword:
+```
+output neuron <Neuron name> {
+    <fields>
+}
+```
+
+##### Example
+A complete example will follow, the `NDLExample.ndl` file:
 ```
 network NDLExample {
-	/*
+	/**
 	 * Implementation detail: discretization granularity
-	 * The [0, 1] real interval is divided into 10000 parts
+	 * The [-1, 1] real interval is divided into 10000 parts
 	 *
 	 * In what follows, any threshold value or synaptic weight
 	 * within the [0, 1] interval will be converted accordingly
