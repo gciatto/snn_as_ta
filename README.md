@@ -223,3 +223,96 @@ O4 = Output(y4); // `O4` will receive the outcome of `N4` over the y4 channel
 // The automata composing the system (i.e. to be executed) are the following
 system I, N1, N2, N3, N4, O4;
 ```
+
+### Network Description Language & Generator
+The network description 
+
+```
+network NDLExample {
+	/*
+	 * Implementation detail: discretization granularity
+	 * The [0, 1] real interval is divided into 10000 parts
+	 *
+	 * In what follows, any threshold value or synaptic weight
+	 * within the [0, 1] interval will be converted accordingly
+	 * (and automatically)
+	 */
+	granularity: 10000
+
+	/**
+	 * Fixed-Rate input generator
+	 * 	time window size: 1 time unit
+	 * 	initial delay: 2 time units
+	 */
+	input I1 {
+		rate(1, 2)
+	}
+
+	/**
+	 * Non-Deterministic input generator
+	 * 	minimum time distance: 2 time units
+	 * 	initial delay: 3 time units
+	 */
+	input I2 {
+		any(2, 3)
+	}
+
+	/**
+	 * Input sequence generator, generating the following sequence:
+	 * i) an initial quiescence of 4 time units
+	 * ii) a spike followed by a 1 time unit pause
+	 * iii) a spike followed by a 1 time unit pause
+	 * iv) the infinite repetition of a spike followed by a 2 time units pause
+	 */
+	input I3 {
+		pause(4) spike pause spike pause (spike pause(2) repeat)
+	}
+
+	/**
+	 * Intermediate neuron
+	 */
+	neuron N1 {
+		accumulation: 2
+		leakage: 7\9 		// 0.7777...
+		refractory: 3
+		threshold: 0.75
+	}
+
+	/*
+	 * Default accumulation: 1 time unit
+	 * Default leakage: 1\2 = 0.5
+	 * Default refractory: 1 time unit
+	 * Default threshold: 0
+	 */
+	neuron N2 { }
+
+	/*
+	 * Default accumulation: 1 time unit
+	 * Default leakage: 1\2 = 0.5
+	 * Default refractory: 1 time unit
+	 */
+	neuron N3 {
+		threshold: 1.0
+	}
+
+	/*
+	 * Output neuron (an output generator will be connected to such a neuron)
+	 * Default accumulation: 1 time unit
+	 */
+	output neuron NO {
+		threshold: 3.0
+		leakage: 1\4
+		refractory: 2
+	}
+
+	// SYNAPSES DEFINITIONS //////////////////////////
+
+	I1 -> N1 : 1.0 		// excitatory synapse
+	I2 -> N2 : -1.0		// inhibitory synapse
+	I3 -> N3 : 0.7
+
+	N1 -> NO : 0.5
+	N2 -> NO : -0.1
+	N3 -> NO			// default weight: 1.0
+}
+```
