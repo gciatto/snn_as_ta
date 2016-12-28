@@ -289,13 +289,24 @@ where all fields are optional and have a default value.
 
 An *output* neuron definition simply differs for the `output` keyword:
 ```
-output neuron <Neuron name> {
+output neuron <Output neuron name> {
     <fields>
 }
 ```
 
+
+The *Network topology section* consists of several synapse definitions.
+There exist three types of synapse definition:
+* `<Input sequence name> -> <Neuron name> : <Weight>`
+* `<Neuron name> -> <Neuron name> : <Weight>`
+* `<Neuron name> -> <Output neuron name> : <Weight>`
+
+where the names are the one defined into the previous section, and weights must be real numbers within the `[0, 1]` interval.
+If the `: <Weight>` clause is omitted, the default synaptic weight is `1.0`.
+No self-loop are allowed, i.e., the LHS must be different from the RHS in all synapses of type `<Neuron name> -> <Neuron name>`.
+
 ##### Example
-A complete example will follow, the `NDLExample.ndl` file:
+A complete example will follow: the `examples/NDLExample.ndl` file:
 ```
 network NDLExample {
 	/**
@@ -374,6 +385,9 @@ network NDLExample {
 		refractory: 2
 	}
 
+
+
+
 	// SYNAPSES DEFINITIONS //////////////////////////
 
 	I1 -> N1 : 1.0 		// excitatory synapse
@@ -385,3 +399,13 @@ network NDLExample {
 	N3 -> NO			// default weight: 1.0
 }
 ```
+
+#### The generator
+Any well formed `.ndl` file can be converted into a ready-to-use `Uppaal` system by means of the `ndl2uppaal.jar` program.
+
+The following syntax
+```
+java -jar path/to/ndl2uppaal.jar path/to/network_description_language.ndl
+```
+will create the file `src-gen/<Network name>.xml` contaning the `Uppaal` system.
+Some exceptions may be showed by the console, even if the `.ndl` file is correct.
